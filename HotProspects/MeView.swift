@@ -9,8 +9,7 @@ import SwiftUI
 import CoreImage.CIFilterBuiltins
 
 struct MeView: View {
-    @State private var name: String = ""
-    @State private var email: String = ""
+    @State private var currentUser: CurrentUser = CurrentUser()
     @State private var qrCode: UIImage = UIImage()
     
     let context = CIContext()
@@ -20,12 +19,13 @@ struct MeView: View {
         NavigationView {
             VStack {
                 Form {
-                    TextField("Name", text: $name)
+                    TextField("Name", text: $currentUser.name)
                         .textContentType(.name)
-                    TextField("Email", text: $email)
+                    TextField("Email", text: $currentUser.email)
                         .textContentType(.emailAddress)
                         .textInputAutocapitalization(.never)
                 }
+                .disableAutocorrection(true)
                 
                 Image(uiImage: qrCode)
                     .interpolation(.none)
@@ -45,19 +45,39 @@ struct MeView: View {
             }
             .navigationTitle("My QR Code")
             .onAppear {
+                loadUser()
                 updateQRCode()
             }
-            .onChange(of: name) { _ in
+            .onChange(of: currentUser.name) { _ in
                 updateQRCode()
+                saveUser()
             }
-            .onChange(of: email) { _ in
+            .onChange(of: currentUser.email) { _ in
                 updateQRCode()
+                saveUser()
             }
         }
     }
     
     func updateQRCode() {
-        qrCode = generateQRCodeImage(from: "\(name)\n\(email)")
+        qrCode = generateQRCodeImage(from: "\(currentUser.name)\n\(currentUser.email)")
+    }
+    
+    func loadUser() {
+        if let data = UserDefaults.standard.data(forKey: "CurrentUser") {
+            if let decodedUser = try? JSONDecoder().decode(CurrentUser.self, from: data) {
+                self.currentUser = decodedUser
+                return
+            }
+        }
+        
+        self.currentUser = CurrentUser()
+    }
+    
+    func saveUser() {
+        if let encodedUser = try? JSONEncoder().encode(currentUser) {
+            UserDefaults.standard.set(encodedUser, forKey: "CurrentUser")
+        }
     }
     
     func generateQRCodeImage(from string: String) -> UIImage {
