@@ -14,14 +14,29 @@ struct ProspectView: View {
         case none, contacted, uncontacted
     }
     
+    enum SortType {
+        case name, email, dateAdded
+    }
+    
     @EnvironmentObject var prospects: Prospects
     @State private var showQRScanSheet: Bool = false
     var filter: FilterType
+    @State var sort: SortType = .name
         
     var body: some View {
         NavigationView {
             List {
-                ForEach(filteredProspects) { prospect in
+                ForEach(
+                    filteredProspects.sorted(by: {
+                        switch sort {
+                        case .name:
+                            return $0.name < $1.name
+                        case .email:
+                            return $0.email < $1.email
+                        case .dateAdded:
+                            return $0.dateAdded < $1.dateAdded
+                        }
+                    })) { prospect in
                     HStack {
                         VStack(alignment: .leading) {
                             Text(prospect.name)
@@ -82,11 +97,71 @@ struct ProspectView: View {
             }
             .navigationTitle(title)
             .toolbar {
-                Button {
-                    showQRScanSheet = true
-                } label: {
-                    Label("Scan Prospect", systemImage: "qrcode.viewfinder")
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Menu(content: {
+                        Button(action: {
+                            sort = .name
+                        }, label: {
+                            if sort == .name {
+                                HStack {
+                                    Text("By Name…")
+                                    Image(systemName: "checkmark.circle.fill")
+                                }
+                            } else {
+                                Text("By Name…")
+                            }
+                        })
+                        Button(action: {
+                            sort = .email
+                        }, label: {
+                            if sort == .email {
+                                HStack {
+                                    Text("By Email…")
+                                    Image(systemName: "checkmark.circle.fill")
+                                }
+                            } else {
+                                Text("By Email…")
+                            }
+                        })
+                        Button(action: {
+                            sort = .dateAdded
+                        }, label: {
+                            if sort == .dateAdded {
+                                HStack {
+                                    Text("By Date Added…")
+                                    Image(systemName: "checkmark.circle.fill")
+                                }
+                            } else {
+                                Text("By Date Added…")
+                            }
+                        })
+                    }, label: {
+                        Text("Sort…")
+                    })
                 }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showQRScanSheet = true
+                    } label: {
+                        Label("Scan Prospect", systemImage: "qrcode.viewfinder")
+                    }
+                }
+                /*ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        let person1 = Prospect()
+                        person1.name = "A"
+                        person1.email = "zazzle@z.com"
+                        
+                        let person2 = Prospect()
+                        person2.name = "Z"
+                        person2.email = "dante@test.com"
+                        
+                        prospects.add(person1)
+                        prospects.add(person2)
+                    } label: {
+                        Text("Add Tests")
+                    }
+                }*/
             }
             .sheet(isPresented: $showQRScanSheet) {
                 CodeScannerView(codeTypes: [.qr], simulatedData: "Paul Hudson\npaul@hackingwithswift.com", completion: handleScan)

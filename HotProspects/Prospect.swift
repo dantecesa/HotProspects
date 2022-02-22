@@ -11,6 +11,7 @@ class Prospect: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var name: String = "Default Name"
     var email: String = "default@email.com"
+    var dateAdded: Date = Date.now
     fileprivate(set) var isContacted: Bool = false
     
     static func == (lhs: Prospect, rhs: Prospect) -> Bool {
