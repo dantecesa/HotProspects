@@ -25,7 +25,7 @@ class Prospect: Identifiable, Codable, Equatable {
     @Published private(set) var people: [Prospect]
     
     init() {
-        if let data = UserDefaults.standard.data(forKey: saveKey) {
+        if let data = try? Data(contentsOf: FileManager.documentsDirectory.appendingPathComponent("prospects")) {
             if let decodedPeople = try? JSONDecoder().decode([Prospect].self, from: data) {
                 people = decodedPeople
                 return
@@ -51,7 +51,11 @@ class Prospect: Identifiable, Codable, Equatable {
     
     private func save() {
         if let encoded = try? JSONEncoder().encode(people) {
-            UserDefaults.standard.set(encoded, forKey: saveKey)
+            do {
+                try encoded.write(to: FileManager.documentsDirectory.appendingPathComponent("prospects"))
+            } catch {
+                print("Something went wrong when writing prospects to disk.")
+            }
         }
     }
     
