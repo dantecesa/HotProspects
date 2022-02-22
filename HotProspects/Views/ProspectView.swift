@@ -46,9 +46,9 @@ struct ProspectView: View {
                                 .foregroundColor(.secondary)
                         }
                         
-                        Spacer()
-                        
                         if prospect.isContacted && filter == .none {
+                            Spacer()
+                            
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
