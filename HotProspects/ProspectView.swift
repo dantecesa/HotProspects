@@ -22,14 +22,31 @@ struct ProspectView: View {
         NavigationView {
             List {
                 ForEach(filteredProspects) { prospect in
-                    VStack(alignment: .leading) {
-                        Text(prospect.name)
-                            .font(.headline)
-                        Text(prospect.email)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(prospect.name)
+                                .font(.headline)
+                            Text(prospect.email)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        if prospect.isContacted && filter == .none {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
                     }
                     .swipeActions {
+                        Button {
+                            prospects.delete(prospect)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                        .tint(.red)
+                        
                         if prospect.isContacted {
                             Button {
                                 prospects.toggleContacted(prospect)
@@ -39,18 +56,18 @@ struct ProspectView: View {
                             .tint(.blue)
                         } else {
                             Button {
-                                prospects.toggleContacted(prospect)
-                            } label: {
-                                Label("Mark Contacted", systemImage: "person.crop.circle.fill.badge.checkmark")
-                            }
-                            .tint(.green)
-                            
-                            Button {
                                 addNotifications(for: prospect)
                             } label: {
                                 Label("Remind me", systemImage: "bell")
                             }
                             .tint(.orange)
+                            
+                            Button {
+                                prospects.toggleContacted(prospect)
+                            } label: {
+                                Label("Mark Contacted", systemImage: "person.crop.circle.fill.badge.checkmark")
+                            }
+                            .tint(.green)
                         }
                     }
                 }

@@ -7,11 +7,15 @@
 
 import SwiftUI
 
-class Prospect: Identifiable, Codable {
+class Prospect: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var name: String = "Default Name"
     var email: String = "default@email.com"
     fileprivate(set) var isContacted: Bool = false
+    
+    static func == (lhs: Prospect, rhs: Prospect) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 @MainActor class Prospects: ObservableObject {
@@ -33,6 +37,15 @@ class Prospect: Identifiable, Codable {
     func add(_ prospect: Prospect) {
         people.append(prospect)
         save()
+    }
+    
+    func delete(_ prospect: Prospect) {
+        for (index, person) in people.enumerated() {
+            if prospect == person {
+                people.remove(at: index)
+                save()
+            }
+        }
     }
     
     private func save() {
