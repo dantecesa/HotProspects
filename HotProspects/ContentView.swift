@@ -33,6 +33,7 @@ struct ContentView: View {
                 }
         }
         .environmentObject(prospects)
+        .preferredColorScheme(.dark)
     }
 }
 
