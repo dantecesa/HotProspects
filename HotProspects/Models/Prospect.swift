@@ -20,12 +20,12 @@ class Prospect: Identifiable, Codable, Equatable {
 }
 
 @MainActor class Prospects: ObservableObject {
-    let saveKey: String = "savedProspects"
+    let savePath: URL = FileManager.documentsDirectory.appendingPathComponent("prospects")
     
     @Published private(set) var people: [Prospect]
     
     init() {
-        if let data = try? Data(contentsOf: FileManager.documentsDirectory.appendingPathComponent("prospects")) {
+        if let data = try? Data(contentsOf: savePath) {
             if let decodedPeople = try? JSONDecoder().decode([Prospect].self, from: data) {
                 people = decodedPeople
                 return
@@ -52,7 +52,7 @@ class Prospect: Identifiable, Codable, Equatable {
     private func save() {
         if let encoded = try? JSONEncoder().encode(people) {
             do {
-                try encoded.write(to: FileManager.documentsDirectory.appendingPathComponent("prospects"))
+                try encoded.write(to: savePath, options: [.atomic, .completeFileProtection])
             } catch {
                 print("Something went wrong when writing prospects to disk.")
             }
