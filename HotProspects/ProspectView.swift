@@ -41,7 +41,9 @@ struct ProspectView: View {
                     }
                     .swipeActions {
                         Button {
-                            prospects.delete(prospect)
+                            withAnimation {
+                                prospects.delete(prospect)
+                            }
                         } label: {
                             Label("Delete", systemImage: "trash")
                         }
@@ -49,21 +51,27 @@ struct ProspectView: View {
                         
                         if prospect.isContacted {
                             Button {
-                                prospects.toggleContacted(prospect)
+                                withAnimation {
+                                    prospects.toggleContacted(prospect)
+                                }
                             } label: {
                                 Label("Mark Uncontacted", systemImage: "person.crop.circle.badge.xmark")
                             }
                             .tint(.blue)
                         } else {
                             Button {
-                                addNotifications(for: prospect)
+                                withAnimation {
+                                    addNotifications(for: prospect)
+                                }
                             } label: {
                                 Label("Remind me", systemImage: "bell")
                             }
                             .tint(.orange)
                             
                             Button {
-                                prospects.toggleContacted(prospect)
+                                withAnimation {
+                                    prospects.toggleContacted(prospect)
+                                }
                             } label: {
                                 Label("Mark Contacted", systemImage: "person.crop.circle.fill.badge.checkmark")
                             }
